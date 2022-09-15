@@ -19,9 +19,13 @@ Use `AsyncSeriesEventEmitter` for executing a collection of async event subscrib
 The following example demonstrates a before load event which executes event subscribers and continues.
 
 
-    import { AsyncSeriesEventEmitter } from '@themost/events'
+    const { AsyncSeriesEventEmitter } = require('@themost/events');
     class UserAction {
-        beforeLoad = new AsyncSeriesEventEmitter();
+        
+        constructor() {
+            this.beforeLoad = new AsyncSeriesEventEmitter();
+        }
+        
         async load() {
             await this.beforeLoad.emit({
                 target: this
@@ -30,35 +34,40 @@ The following example demonstrates a before load event which executes event subs
         }        
     }
 
-    const item = new UserAction();
-
-    item.beforeLoad.subscribe((event) => {
-        event.target.status = 'waiting';
-    });
-
-    item.beforeLoad.subscribe((event) => {
-        return new Promise((resolve) => {
-            // wait for something
-            setTimeout(() => {
-                event.target.status = 'active';
-            }, 1000);
+    (async function () {
+        const item = new UserAction();
+        item.beforeLoad.subscribe((event) => {
+            event.target.status = 'waiting';
         });
-    });
     
-    // perform load
-    await item.load();
-    console.log('Loaded', 'status', item.status);
+        item.beforeLoad.subscribe((event) => {
+            return new Promise((resolve) => {
+                // wait for something
+                setTimeout(() => {
+                    event.target.status = 'active';
+                    resolve();
+                }, 1000);
+            });
+        });
+        await item.load();
+        console.log('Loaded', 'status', item.status);
+    })().then(() => {
+        //
+    });
 
 Use `SyncSeriesEventEmitter` for executing a collection of sync event subscribers in series.
 The following example demonstrates an after load event which executes event subscribers and continues.
 
 
-    import { SyncSeriesEventEmitter } from '@themost/events'
+    const { SyncSeriesEventEmitter } = require('@themost/events');
     class UserAction {
-        afterLoad = new AsyncSeriesEventEmitter();
-        async load() {
+        constructor() {
+            this.afterLoad = new SyncSeriesEventEmitter();
+        }
+        
+        load() {
             this.status = 'unknown';
-            await this.afterLoad.emit({
+            this.afterLoad.emit({
                 target: this
             });
         }        
@@ -71,9 +80,9 @@ The following example demonstrates an after load event which executes event subs
         event.target.dateCreated = new Date();
     });
 
-    item.beforeLoad.subscribe((event) => {
+    item.afterLoad.subscribe((event) => {
         if (event.target.status === 'waiting') {
-            event.status = 'active';
+            event.target.status = 'active';
         }
     });
     
