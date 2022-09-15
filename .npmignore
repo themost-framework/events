@@ -11,7 +11,11 @@ node_modules
 
 # test
 spec
-src/test
+src/*.spec.ts
+.nyc_output
+.nycrc.json
+test.ts
+
 
 # karma
 karma.conf.js
