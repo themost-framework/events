@@ -1,0 +1,24 @@
+ dev
+.vscode
+.theia
+.idea
+.devcontainer
+.DS_Store
+node_modules
+
+# github
+.github
+
+# test
+spec
+src/test
+
+# karma
+karma.conf.js
+
+# build
+rollup.config.js
+
+# typescript
+tsconfig.json
+tsconfig.spec.json
