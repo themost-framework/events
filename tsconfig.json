@@ -30,7 +30,8 @@
     },
     "exclude": [
         "node_modules",
-        "test"
+        "test",
+        "**/*.spec.ts"
     ],
     "files": [
         "src/index.ts",
