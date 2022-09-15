@@ -21,7 +21,12 @@
         "lib": [
             "es2017",
             "dom"
-        ]
+        ],
+        "paths": {
+            "@themost/events": [
+                "src/index"
+            ]
+        }
     },
     "exclude": [
         "node_modules",
