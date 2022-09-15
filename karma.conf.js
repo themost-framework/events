@@ -4,7 +4,7 @@
 // tslint:disable object-literal-sort-keys
 module.exports = function(config) {
     config.set({
-      basePath: "./spec/",
+      basePath: "./src/",
       frameworks: ["jasmine", "karma-typescript"],
       files: [
         { pattern: "**/*.ts" }

@@ -1,4 +1,4 @@
-import {AsyncSeriesEventEmitter} from '@themost/events';
+import {AsyncSeriesEventEmitter} from './AsyncSeriesEventEmitter';
 
 describe('AsyncSeriesEventEmitter', () => {
 

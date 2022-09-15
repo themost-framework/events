@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "baseUrl": ".",
         "target": "es2015",
         "module": "commonjs",
         "moduleResolution": "node",
@@ -20,7 +21,7 @@
         ],
         "paths": {
             "@themost/events": [
-                "src/index"
+                "./src/index"
             ]
         },
         "lib": [
@@ -33,7 +34,6 @@
     ],
     "include": [
         "src",
-        "spec",
         "test.ts"
     ]
 }
