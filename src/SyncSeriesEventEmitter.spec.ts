@@ -1,4 +1,4 @@
-import { SyncSeriesEventEmitter } from '../src/SyncSeriesEventEmitter';
+import { SyncSeriesEventEmitter } from './SyncSeriesEventEmitter';
 describe('SyncSeriesEventEmitter', () => {
 
     it('should use SeriesEventEmitter.subscribe()', async ()=> {
