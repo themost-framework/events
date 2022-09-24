@@ -55,6 +55,40 @@ The following example demonstrates a before load event which executes event subs
         //
     });
 
+Use `AsyncEventEmitter` for executing a collection of async event subscribers in parallel.
+
+    const { AsyncEventEmitter } = require('@themost/events');
+    class UserAction {
+        
+        constructor() {
+            this.beforeLoad = new AsyncEventEmitter();
+        }
+        
+        async load() {
+            this.beforeLoad.emit({
+                target: this
+            });
+            this.dateCreated = new Date();
+        }        
+    }
+
+    const item = new UserAction();
+    item.beforeLoad.subscribe((event) => {
+        event.target.status = 'waiting';
+    });
+
+    item.beforeLoad.subscribe((event) => {
+        return new Promise((resolve) => {
+            // wait for something
+            setTimeout(() => {
+                event.target.status = 'active';
+                resolve();
+            }, 1000);
+        });
+    });
+    item.load();
+
+
 Use `SyncSeriesEventEmitter` for executing a collection of sync event subscribers in series.
 The following example demonstrates an after load event which executes event subscribers and continues.
 
