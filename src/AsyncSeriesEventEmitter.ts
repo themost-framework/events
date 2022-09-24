@@ -15,16 +15,21 @@ function wrapAsyncListener(asyncListener: (...arg: any) => Promise<void>) {
 
 /**
  * Wraps an async listener and returns a callback-like function
- * @param {string} event
  * @param {function(...*):Promise<void>} asyncListener
  */
  function wrapOnceAsyncListener(asyncListener: (arg: any) => Promise<void>) {
     const wrapOnceListener = function() {
         return asyncListener.apply(null, Array.from(arguments)).then(() => {
-            Object.defineProperty(wrapOnceListener, 'fired', {
+            Object.defineProperty(wrapOnceListener, 'once', {
                 configurable: true,
                 enumerable: true,
-                value: true
+                value: 'completed'
+            });
+        }).catch(() => {
+            Object.defineProperty(wrapOnceListener, 'once', {
+                configurable: true,
+                enumerable: true,
+                value: 'rejected'
             });
         });
     }
@@ -39,27 +44,36 @@ function wrapAsyncListener(asyncListener: (...arg: any) => Promise<void>) {
 
 class AsyncSeriesEventEmitter<T> {
 
-    private readonly listeners: ((value: T) => void)[] = [];
+    private readonly listeners: ((value?: T) => void)[] = [];
 
     async emit(value?: T): Promise<void> {
         for (const syncListener of this.listeners) {
             const listener = syncListener as any;
-            const fired = (typeof listener.fired === 'boolean' && listener.fired);
-            if (fired === false) {
-                await listener(value);
+            if (typeof listener.once === 'string') {
+                if (listener.once !== 'waiting') {
+                    continue;
+                }
+                Object.defineProperty(listener, 'once', {
+                    configurable: true,
+                    enumerable: true,
+                    value: 'pending'
+                });
+                listener(value);
+            } else {
+                listener(value);
             }
         }
     }
 
-    subscribe(next: (value: T) => Promise<void>): void {
+    subscribe(next: (value?: T) => Promise<void>): void {
         this.listeners.push(wrapAsyncListener(next));
     }
 
-    subscribeOnce(next: (value: T) => Promise<void>): void {
+    subscribeOnce(next: (value?: T) => Promise<void>): void {
         this.listeners.push(wrapOnceAsyncListener(next));
     }
 
-    unsubscribe(listener: (value: T) => Promise<void>): void {
+    unsubscribe(listener: (value?: T) => Promise<void>): void {
         for (let i = 0; i < this.listeners.length; i++) {
             const syncListener = this.listeners[i] as any;
             if (syncListener._listener === listener) {

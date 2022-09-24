@@ -33,7 +33,7 @@ function wrapOnceSyncListener<T>(syncListener: (arg: T) => void): (arg: T) => vo
 
 class SyncSeriesEventEmitter<T> {
 
-    private readonly listeners: ((value: T) => void)[] = [];
+    private readonly listeners: ((value?: T) => void)[] = [];
 
     emit(value?: T): void {
         for (const syncListener of this.listeners) {
@@ -45,15 +45,15 @@ class SyncSeriesEventEmitter<T> {
         }
     }
 
-    subscribe(next: (value: T) => void): void {
+    subscribe(next: (value?: T) => void): void {
         this.listeners.push(wrapSyncListener(next));
     }
 
-    subscribeOnce(next: (value: T) => void): void {
+    subscribeOnce(next: (value?: T) => void): void {
         this.listeners.push(wrapOnceSyncListener(next));
     }
 
-    unsubscribe(listener: (value: T) => void): void {
+    unsubscribe(listener: (value?: T) => void): void {
         for (let i = 0; i < this.listeners.length; i++) {
             const syncListener = this.listeners[i] as any;
             if (syncListener._listener === listener) {
