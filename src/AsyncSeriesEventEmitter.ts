@@ -15,16 +15,21 @@ function wrapAsyncListener(asyncListener: (...arg: any) => Promise<void>) {
 
 /**
  * Wraps an async listener and returns a callback-like function
- * @param {string} event
  * @param {function(...*):Promise<void>} asyncListener
  */
  function wrapOnceAsyncListener(asyncListener: (arg: any) => Promise<void>) {
     const wrapOnceListener = function() {
         return asyncListener.apply(null, Array.from(arguments)).then(() => {
-            Object.defineProperty(wrapOnceListener, 'fired', {
+            Object.defineProperty(wrapOnceListener, 'once', {
                 configurable: true,
                 enumerable: true,
-                value: true
+                value: 'completed'
+            });
+        }).catch(() => {
+            Object.defineProperty(wrapOnceListener, 'once', {
+                configurable: true,
+                enumerable: true,
+                value: 'rejected'
             });
         });
     }
@@ -44,9 +49,18 @@ class AsyncSeriesEventEmitter<T> {
     async emit(value?: T): Promise<void> {
         for (const syncListener of this.listeners) {
             const listener = syncListener as any;
-            const fired = (typeof listener.fired === 'boolean' && listener.fired);
-            if (fired === false) {
-                await listener(value);
+            if (typeof listener.once === 'string') {
+                if (listener.once !== 'waiting') {
+                    continue;
+                }
+                Object.defineProperty(listener, 'once', {
+                    configurable: true,
+                    enumerable: true,
+                    value: 'pending'
+                });
+                listener(value);
+            } else {
+                listener(value);
             }
         }
     }
