@@ -39,7 +39,7 @@ function wrapAsyncListener(asyncListener: (...arg: any) => Promise<void>) {
 
 class AsyncSeriesEventEmitter<T> {
 
-    private readonly listeners: ((value: T) => void)[] = [];
+    private readonly listeners: ((value?: T) => void)[] = [];
 
     async emit(value?: T): Promise<void> {
         for (const syncListener of this.listeners) {
@@ -51,15 +51,15 @@ class AsyncSeriesEventEmitter<T> {
         }
     }
 
-    subscribe(next: (value: T) => Promise<void>): void {
+    subscribe(next: (value?: T) => Promise<void>): void {
         this.listeners.push(wrapAsyncListener(next));
     }
 
-    subscribeOnce(next: (value: T) => Promise<void>): void {
+    subscribeOnce(next: (value?: T) => Promise<void>): void {
         this.listeners.push(wrapOnceAsyncListener(next));
     }
 
-    unsubscribe(listener: (value: T) => Promise<void>): void {
+    unsubscribe(listener: (value?: T) => Promise<void>): void {
         for (let i = 0; i < this.listeners.length; i++) {
             const syncListener = this.listeners[i] as any;
             if (syncListener._listener === listener) {

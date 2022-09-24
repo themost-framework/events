@@ -65,7 +65,7 @@ function wrapOnceAsyncListener(asyncListener: (arg: any) => Promise<void>,
 }
 
 class AsyncEventEmitter<T> {
-    private readonly listeners: ((value: T) => void)[] = [];
+    private readonly listeners: ((value?: T) => void)[] = [];
 
     emit(value?: T): void {
         for (const eventListener of this.listeners) {
@@ -86,15 +86,15 @@ class AsyncEventEmitter<T> {
         }
     }
 
-    subscribe(next: (value: T) => Promise<void>, error?: (err: Error) => void, complete?: () => void): void {
+    subscribe(next: (value?: T) => Promise<void>, error?: (err: Error) => void, complete?: () => void): void {
         this.listeners.push(wrapAsyncListener(next, error, complete));
     }
 
-    subscribeOnce(next: (value: T) => Promise<void>, error?: (err: Error) => void, complete?: () => void): void {
+    subscribeOnce(next: (value?: T) => Promise<void>, error?: (err: Error) => void, complete?: () => void): void {
         this.listeners.push(wrapOnceAsyncListener(next, error, complete));
     }
 
-    unsubscribe(listener: (value: T) => Promise<void>): void {
+    unsubscribe(listener: (value?: T) => Promise<void>): void {
         for (let i = 0; i < this.listeners.length; i++) {
             const eventListener = this.listeners[i] as any;
             if (eventListener._listener === listener) {
