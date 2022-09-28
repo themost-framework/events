@@ -46,9 +46,9 @@ class AsyncSeriesEventEmitter<T> {
 
     private readonly listeners: ((value?: T) => void)[] = [];
 
-    async emit(value?: T): Promise<void> {
-        for (const syncListener of this.listeners) {
-            const listener = syncListener as any;
+    async emit(value: T): Promise<void> {
+        for (const asyncListener of this.listeners) {
+            const listener = asyncListener as any;
             if (typeof listener.once === 'string') {
                 if (listener.once !== 'waiting') {
                     continue;
@@ -58,22 +58,22 @@ class AsyncSeriesEventEmitter<T> {
                     enumerable: true,
                     value: 'pending'
                 });
-                listener(value);
+                await listener(value);
             } else {
-                listener(value);
+                await listener(value);
             }
         }
     }
 
-    subscribe(next: (value?: T) => Promise<void>): void {
+    subscribe(next: (value: T) => Promise<void>): void {
         this.listeners.push(wrapAsyncListener(next));
     }
 
-    subscribeOnce(next: (value?: T) => Promise<void>): void {
+    subscribeOnce(next: (value: T) => Promise<void>): void {
         this.listeners.push(wrapOnceAsyncListener(next));
     }
 
-    unsubscribe(listener: (value?: T) => Promise<void>): void {
+    unsubscribe(listener: (value: T) => Promise<void>): void {
         for (let i = 0; i < this.listeners.length; i++) {
             const syncListener = this.listeners[i] as any;
             if (syncListener._listener === listener) {

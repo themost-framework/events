@@ -70,7 +70,7 @@ describe('AsyncEventEmitter', () => {
         spyOn(handler, 'handleComplete');
         newItem.load.subscribe(async () => {
             eventArgs.value += 1;
-        }, null, handler.handleComplete);
+        }, undefined, handler.handleComplete);
         const eventArgs = {
             value: 100
         }
@@ -148,7 +148,7 @@ describe('AsyncEventEmitter', () => {
         spyOn(handler, 'handleComplete');
         newItem.load.subscribeOnce(async () => {
             eventArgs.value += 1;
-        }, null, handler.handleComplete);
+        }, undefined, handler.handleComplete);
         const eventArgs = {
             value: 100
         }
