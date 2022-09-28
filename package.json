@@ -1,6 +1,6 @@
 {
   "name": "@themost/events",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Sync and async event emitters",
   "module": "dist/index.esm.js",
   "main": "dist/index.js",
