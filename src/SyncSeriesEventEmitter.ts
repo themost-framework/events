@@ -1,3 +1,5 @@
+import {SyncSubscription} from './Subscription';
+
 function wrapSyncListener<T>(syncListener: (arg: T) => void): (arg: T) => void {
     // tslint:disable-next-line:only-arrow-functions
     const wrapListener = function() {
@@ -45,8 +47,9 @@ class SyncSeriesEventEmitter<T> {
         }
     }
 
-    subscribe(next: (value: T) => void): void {
+    subscribe(next: (value: T) => void): SyncSubscription {
         this.listeners.push(wrapSyncListener(next));
+        return new SyncSubscription(this, next);
     }
 
     subscribeOnce(next: (value: T) => void): void {
