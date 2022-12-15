@@ -1,4 +1,4 @@
-
+import {AsyncSubscription} from './Subscription';
 
 function wrapAsyncListener(asyncListener: (...arg: any) => Promise<void>,
                            error?: (err: Error) => void,
@@ -86,8 +86,9 @@ class AsyncEventEmitter<T> {
         }
     }
 
-    subscribe(next: (value: T) => Promise<void>, error?: (err: Error) => void, complete?: () => void): void {
+    subscribe(next: (value: T) => Promise<void>, error?: (err: Error) => void, complete?: () => void): AsyncSubscription {
         this.listeners.push(wrapAsyncListener(next, error, complete));
+        return new AsyncSubscription(this, next);
     }
 
     subscribeOnce(next: (value: T) => Promise<void>, error?: (err: Error) => void, complete?: () => void): void {
