@@ -1,8 +1,8 @@
 
-import cluster from 'cluster';
+const cluster = require('cluster');
 
 class ProcessSubscription {
-    constructor(private emitter: { unsubscribe(listener: (value: any) => Promise<void>): void }, private listener: (value: any) => Promise<void>) {
+    constructor(private emitter: { unsubscribe(listener: (value: any) => void): void }, private listener: (value: any) => Promise<void>) {
         //
     }
     unsubscribe() {
@@ -16,17 +16,15 @@ class ProcessEventEmitter<T> {
 
     }
 
-    async emit(value: T): Promise<void> {
-        if (typeof process.send === 'function') {
-            process.send(value);
-        } else if (typeof process.emit === 'function') {
+    emit(value: T): void {
+        if (cluster.isWorker == false && typeof process.emit === 'function') {
             process.emit('message', value, null);
-        } else {
-            throw new TypeError('Missing method for emitting events');
+        } else if (typeof process.send === 'function') {
+            process.send(value);
         }
     }
 
-    subscribe(next: (value: T) => Promise<void>): ProcessSubscription {
+    subscribe(next: (value: T) => void): ProcessSubscription {
         if (cluster.isPrimary) {
             if (cluster.workers == null) {
                 this.listener = (value: any) => {
