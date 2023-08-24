@@ -25,39 +25,17 @@ class ProcessEventEmitter<T> {
     }
 
     subscribe(next: (value: T) => void): ProcessSubscription {
-        if (cluster.isPrimary) {
-            if (cluster.workers == null) {
-                this.listener = (value: any) => {
-                    void next(value);
-                }
-                process.on('message', this.listener);
-            } else {
-                this.listener = (worker: any, data: any) => {
-                    if (cluster.workers) {
-                        const workers = cluster.workers;
-                        Object.keys(workers).forEach((id) => {
-                            const worker = workers[id];
-                            if (worker) {
-                                worker.send(data);
-                            }
-                         });
-                    }
-                };
-                cluster.on('message', this.listener);
-            }
-        } else {
-            this.listener = (value: any) => {
-                void next(value);
-            }
-            process.on('message', this.listener);
-        }
+        // create new listener
+        this.listener = (value: any) => {
+            void next(value);
+        };
+        // attach listener
+        process.on('message', this.listener);
+        // and return subscription
         return new ProcessSubscription(this, this.listener);
     }
 
     unsubscribe() {
-        if (cluster.isPrimary  && cluster.workers) {
-            cluster.removeListener('message', this.listener);
-        }
         process.removeListener('message', this.listener);
     }
 
