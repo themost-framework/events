@@ -18,9 +18,15 @@ class ProcessEventEmitter<T> {
 
     emit(value: T): void {
         if (cluster.isWorker == false && typeof process.emit === 'function') {
-            process.emit('message', value, null);
+            process.emit('message', {
+                target: 'ProcessEventEmitter',
+                value: value
+            }, null);
         } else if (typeof process.send === 'function') {
-            process.send(value);
+            process.send({
+                target: 'ProcessEventEmitter',
+                value: value
+            });
         } else {
             throw new TypeError('Invalid process type for sending or receiving events');
         }
@@ -28,8 +34,10 @@ class ProcessEventEmitter<T> {
 
     subscribe(next: (value: T) => void | Promise<void>): ProcessSubscription {
         // create new listener
-        this.listener = (value: any) => {
-            void next(value);
+        this.listener = (event: { target: any, value: any }) => {
+            if (event.target && event.target === 'ProcessEventEmitter') {
+                void next(event.value);
+            }
         };
         // attach listener
         process.on('message', this.listener);
