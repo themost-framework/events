@@ -21,10 +21,12 @@ class ProcessEventEmitter<T> {
             process.emit('message', value, null);
         } else if (typeof process.send === 'function') {
             process.send(value);
+        } else {
+            throw new TypeError('Invalid process type for sending or receiving events');
         }
     }
 
-    subscribe(next: (value: T) => void): ProcessSubscription {
+    subscribe(next: (value: T) => void | Promise<void>): ProcessSubscription {
         // create new listener
         this.listener = (value: any) => {
             void next(value);

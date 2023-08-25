@@ -1,8 +1,10 @@
 {
   "exclude": [
-    "src/**/*.spec.ts"
+    "src/**/*.spec.ts",
+    "platform-server/src/**/*.spec.ts"
   ],
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "platform-server/src/**/*.ts"
   ]
 }
