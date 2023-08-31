@@ -15,6 +15,8 @@ Sync and async event emitters for both browser and node.js
 
     npm i @themost/events
 
+### AsyncSeriesEventEmitter
+
 Use `AsyncSeriesEventEmitter` for executing a collection of async event subscribers in series. 
 The following example demonstrates a before load event which executes event subscribers and continues.
 
@@ -55,6 +57,8 @@ The following example demonstrates a before load event which executes event subs
         //
     });
 
+### AsyncEventEmitter
+
 Use `AsyncEventEmitter` for executing a collection of async event subscribers in parallel.
 
     const { AsyncEventEmitter } = require('@themost/events');
@@ -88,6 +92,7 @@ Use `AsyncEventEmitter` for executing a collection of async event subscribers in
     });
     item.load();
 
+### SyncSeriesEventEmitter
 
 Use `SyncSeriesEventEmitter` for executing a collection of sync event subscribers in series.
 The following example demonstrates an after load event which executes event subscribers and continues.
@@ -124,3 +129,24 @@ The following example demonstrates an after load event which executes event subs
     item.load();
     console.log('Loaded', 'status', item.status);
     console.log('Loaded', 'dateCreated', item.dateCreated);
+
+### ProcessEventEmitter
+
+Use `ProcessEventEmitter` for sending and receiving process messages in both fork and cluster mode under node.js.
+
+Import `@themost/events/platform-server/register` in your startup script
+
+    import '@themost/events/platform-server/register'
+
+If your application is running in cluster mode, each message received by the primary process will be forwarded to each worker of a cluster. This operation is very important when you are implementing shared services across cluster workers and enables the communication between of them.
+
+Start sending and receiving messages:
+
+    new ProcessEventEmitter().emit(msg);
+
+    ...
+
+    new ProcessEventEmitter().subscribe((value) => {
+        // write your code here
+    });
+

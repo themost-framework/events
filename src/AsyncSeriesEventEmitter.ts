@@ -1,4 +1,4 @@
-
+import {AsyncSubscription} from './Subscription';
 
 function wrapAsyncListener(asyncListener: (...arg: any) => Promise<void>) {
     const wrapListener = function() {
@@ -65,8 +65,9 @@ class AsyncSeriesEventEmitter<T> {
         }
     }
 
-    subscribe(next: (value: T) => Promise<void>): void {
+    subscribe(next: (value: T) => Promise<void>): AsyncSubscription {
         this.listeners.push(wrapAsyncListener(next));
+        return new AsyncSubscription(this, next);
     }
 
     subscribeOnce(next: (value: T) => Promise<void>): void {
