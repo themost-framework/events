@@ -82,4 +82,5 @@ describe('Decorators', () => {
         const result = await item.load();
         expect(result).toBe('loaded');
     });
+
 });
