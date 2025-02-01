@@ -10,20 +10,17 @@ module.exports = [
             {
                 name: pkg.name,
                 file: `dist/index.js`,
-                format: 'cjs',
-                sourcemap: true
+                format: 'cjs'
             },
             {
                 name: pkg.name,
                 file: `dist/index.esm.js`,
-                format: 'esm',
-                sourcemap: true
+                format: 'esm'
             },
             {
                 name: pkg.name,
                 file: `dist/index.umd.js`,
-                format: 'umd',
-                sourcemap: true
+                format: 'umd'
             }
         ],
         external: external,
