@@ -1,13 +1,13 @@
-import { afterSync, before, after, beforeSync, beforeAsync, afterAsync, BeforeAfterEvent, BeforeAfterCallback } from "./Decorators";
+import { before, after, beforeAsync, afterAsync, BeforeAfterEvent, BeforeAfterCallback } from "./Decorators";
 
 describe('Decorators', () => {
     it('should use @before() and @after()', async ()=> {
         class MyClass {
-            @beforeSync((event) => {
+            @before((event) => {
                 expect(event.target).toBeInstanceOf(MyClass);
                 expect(event.args).toEqual([5, 5]);
             })
-            @afterSync((event) => {
+            @after((event) => {
                 expect(event.target).toBeInstanceOf(MyClass);
                 expect(event.args).toEqual([5, 5]);
                 expect(event.result).toBe(10);
@@ -26,7 +26,7 @@ describe('Decorators', () => {
             constructor() {
                 this.status = 'unknown';
             }
-            @beforeSync(() => {
+            @before(() => {
                 return {
                     value: 'loaded'
                 }

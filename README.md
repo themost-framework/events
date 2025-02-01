@@ -149,12 +149,12 @@ Start sending and receiving messages:
         // write your code here
     });
 
-### @beforeSync and @afterSync decorators
+### @before and @after decorators
 
-Use `@beforeSync` and `@afterSync` decorators for decorating any class method and execute a procedure before and after method execution.
+Use `@before` and `@after` decorators for decorating any class method and execute a procedure before and after method execution.
 
 ```javascript
-    import { beforeSync, afterSync } from '@themost/events';
+    import { before, after } from '@themost/events';
 
     class UserAction {
         
@@ -162,10 +162,10 @@ Use `@beforeSync` and `@afterSync` decorators for decorating any class method an
             this.status = 'unknown';
         }
         
-        @beforeSync((event) => {
+        @before((event) => {
             event.target.status = 'waiting';
         })
-        @afterSync((event) => {
+        @after((event) => {
             event.target.status = 'active';
         })
         load() {
@@ -181,9 +181,9 @@ The `event` object contains the following properties:
 
 - `target` - the target object which the method is called
 - `args` - the method arguments
-- `result` - the method return value for `@afterSync` and `@afterAsync` decorators
+- `result` - the method return value for `@after` and `@afterAsync` decorators
 
-`@beforeSync` and `@afterSync` callables may return a value which overrides the original method return value. The following example demonstrates how to override the original method return value.
+`@before` and `@after` callables may return a value which overrides the original method return value. The following example demonstrates how to override the original method return value.
 
 ```javascript
     import { before, after } from '@themost/events';
@@ -193,7 +193,7 @@ The `event` object contains the following properties:
             this.status = 'unknown';
         }
         
-        @beforeSync((event) => {
+        @before((event) => {
             event.target.status = 'waiting';
             return {
                 value: 'loaded'
