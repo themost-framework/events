@@ -233,8 +233,9 @@ Use `@before` and `@after` decorators with callback for decorating any class met
         }        
     }
     const item = new UserAction();
-    item.load();
-    console.log('Loaded', 'status', item.status);
+    item.load(() => {
+        console.log('Loaded', 'status', item.status);
+    });
 ```
 
 ### @beforeAsync and @afterAsync decorators
