@@ -4,7 +4,6 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/themost-framework/events)
 ![GitHub Release Date](https://img.shields.io/github/release-date/themost-framework/events)
 [![npm](https://img.shields.io/npm/dw/@themost/events)](https://www.npmjs.com/package/@themost%2Fevents)
-![Snyk Vulnerabilities for npm package](https://img.shields.io/snyk/vulnerabilities/npm/@themost/events)
 
 ![MOST Web Framework Logo](https://github.com/themost-framework/common/raw/master/docs/img/themost_framework_v3_128.png)
 
