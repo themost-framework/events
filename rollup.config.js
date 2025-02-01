@@ -18,6 +18,12 @@ module.exports = [
                 file: `dist/index.esm.js`,
                 format: 'esm',
                 sourcemap: true
+            },
+            {
+                name: pkg.name,
+                file: `dist/index.umd.js`,
+                format: 'umd',
+                sourcemap: true
             }
         ],
         external: external,
