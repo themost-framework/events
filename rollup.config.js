@@ -1,31 +1,28 @@
-const typescript = require('rollup-plugin-typescript2');
-const commonjs = require('rollup-plugin-commonjs');
-const dist = './dist/';
-const name = 'index';
+const typescript = require("@rollup/plugin-typescript");
+const pkg = require("./package.json");
 
-module.exports = [{
-    input: './src/index.ts',
-    output: [
-        {
-            file: `${dist}${name}.cjs.js`,
-            format: 'cjs'
-        },
-        {
-            file: `${dist}${name}.esm.js`,
-            format: 'esm'
-        },
-        {
-            name: '@themost/events',
-            file: `${dist}${name}.js`,
-            format: 'umd'
-        },
-    ],
-    external: [
-    ],
-    plugins: [
-        typescript({
-            declaration: false
-        }),
-        commonjs()
-    ]
-}];
+const external = Object.keys(pkg.dependencies || {})
+
+module.exports = [
+    {
+        input: './src/index.ts',
+        output: [
+            {
+                name: pkg.name,
+                file: `dist/index.js`,
+                format: 'cjs',
+                sourcemap: true
+            },
+            {
+                name: pkg.name,
+                file: `dist/index.esm.js`,
+                format: 'esm',
+                sourcemap: true
+            }
+        ],
+        external: external,
+        plugins: [
+            typescript({ tsconfig: './tsconfig.json' })
+        ]
+    }
+];
