@@ -195,29 +195,6 @@ The `event` object contains the following properties:
         
         @before((event) => {
             event.target.status = 'waiting';
-            return 'loaded';
-        })
-        load() {
-            return 'loading';
-        }
-    }
-    const item = new UserAction();
-    const result = item.load();
-    console.log('Loaded', 'status', item.status, 'result', result);
-```
-
-`@before` and `@after` callables may return a value which overrides the original method return value. The following example demonstrates how to override the original method return value.
-
-```javascript
-    import { before, after } from '@themost/events';
-
-    class UserAction {
-        constructor() {
-            this.status = 'unknown';
-        }
-        
-        @before((event) => {
-            event.target.status = 'waiting';
             return {
                 value: 'loaded'
             };
@@ -229,6 +206,36 @@ The `event` object contains the following properties:
     const item = new UserAction();
     const result = item.load();
     console.log('Loaded', 'status', item.status, 'result', result);
+```
+
+### @before and @after decorators with callback
+
+Use `@before` and `@after` decorators with callback for decorating any class method and execute a procedure before and after method execution.
+
+```javascript
+    import { before, after } from '@themost/events';
+
+    class UserAction {
+        
+        constructor() {
+            this.status = 'unknown';
+        }
+        
+        @before((event, callback) => {
+            void setTimeout(() => {
+                event.target.status = 'loaded';
+                return callback();
+            }, 1000);
+        })
+        load(callback) {
+            this.status = 'loading';
+            return callback();
+        }        
+    }
+    const item = new UserAction();
+    item.load(() => {
+        console.log('Loaded', 'status', item.status);
+    });
 ```
 
 ### @beforeAsync and @afterAsync decorators
