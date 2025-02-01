@@ -1,4 +1,7 @@
 
+declare type BeforeAfterResult<T> = void | {
+    value: T
+} 
 
 /**
  * A decorator function that executes a given callback function before the original method is called.
@@ -24,17 +27,22 @@
  * // Original method test 42
  * ```
  */
-function before(callable: (event: { target: any, args: any[] }) => void): any {
+function before(callable: (event: { target: any, args: any[] }) => BeforeAfterResult<any>): any {
     return function (target: Object, 
         propertyKey: string, 
         descriptor: TypedPropertyDescriptor<any>) {
         const originalMethod = descriptor.value;
         descriptor.value = function (...args: any[]) {
             const target = this;
-            callable({
+            const res = callable({
                 target,
                 args
             });
+            // If the callback returns an object with a 'value' property, return the value
+            // instead of executing the original method.
+            if (res && Object.prototype.hasOwnProperty.call(res, 'value')) {
+                return res.value;
+            }
             return originalMethod.apply(this, args);
         };
         return descriptor;
@@ -59,17 +67,20 @@ function before(callable: (event: { target: any, args: any[] }) => void): any {
  * }
  * ```
  */
-function beforeAsync(callable: (event: { target: any, args: any[] }) => Promise<void>): any {
+function beforeAsync(callable: (event: { target: any, args: any[] }) => Promise<BeforeAfterResult<any>>): any {
     return function (target: Object, 
         propertyKey: string, 
         descriptor: TypedPropertyDescriptor<any>): any {
         const originalMethod = descriptor.value;
         descriptor.value = async function (...args: any[]) {
             const target = this;
-            await callable({
+            const res = await callable({
                 target,
                 args
             });
+            if (res && Object.prototype.hasOwnProperty.call(res, 'value')) {
+                return res.value;
+            }
             return originalMethod.apply(this, args);
         };
         return descriptor;
@@ -83,7 +94,7 @@ function beforeAsync(callable: (event: { target: any, args: any[] }) => Promise<
  * the arguments passed to the original method, and the result of the original method.
  * @returns A decorator function that wraps the original method and calls the callback function after the method execution.
  */
-function after(callable: (event: { target: any, args: any, result?: any }) => void): any {
+function after(callable: (event: { target: any, args: any, result?: any }) => BeforeAfterResult<any>): any {
     return function (target: Object, 
         propertyKey: string, 
         descriptor: TypedPropertyDescriptor<any>): any {
@@ -91,11 +102,14 @@ function after(callable: (event: { target: any, args: any, result?: any }) => vo
         descriptor.value = function (...args: any[]) {
             const result = originalMethod.apply(this, args);
             const target = this;
-            callable({
+            const res = callable({
                 target,
                 args,
                 result
             });
+            if (res && Object.prototype.hasOwnProperty.call(res, 'value')) {
+                return res.value;
+            }
             return result;
         };
         return descriptor;
@@ -121,7 +135,7 @@ function after(callable: (event: { target: any, args: any, result?: any }) => vo
  * }
  * ```
  */
-function afterAsync(callable: (event: { target: any, args: any, result?: any }) => Promise<void>): any {
+function afterAsync(callable: (event: { target: any, args: any, result?: any }) => Promise<BeforeAfterResult<any>>): any {
     return function (target: Object, 
         propertyKey: string, 
         descriptor: TypedPropertyDescriptor<any>): any {
@@ -129,11 +143,14 @@ function afterAsync(callable: (event: { target: any, args: any, result?: any }) 
         descriptor.value = async function (...args: any[]) {
             const result = await originalMethod.apply(this, args);
             const target = this;
-            await callable({
+            const res = await callable({
                 target,
                 args,
                 result
             });
+            if (res && Object.prototype.hasOwnProperty.call(res, 'value')) {
+                return res.value;
+            }
             return result;
         };
         return descriptor;
@@ -141,6 +158,7 @@ function afterAsync(callable: (event: { target: any, args: any, result?: any }) 
 }
 
 export {
+    BeforeAfterResult,
     before,
     beforeAsync,
     after,

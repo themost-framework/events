@@ -20,6 +20,26 @@ describe('Decorators', () => {
         expect(item.add(5, 5)).toBe(10);
     });
 
+    it('should use @before() and @after() and return result', async ()=> {
+        class UserAction {
+            public status: string;
+            constructor() {
+                this.status = 'unknown';
+            }
+            @before(() => {
+                return {
+                    value: 'loaded'
+                }
+            })
+            load() {
+                return 'loading';
+            }
+        }
+        const item = new UserAction();
+        const result = item.load();
+        expect(result).toBe('loaded');
+    });
+
     it('should use @beforeAsync() and @afterAsync()', async ()=> {
         class MyClass {
             @beforeAsync(async (event) => {
@@ -37,5 +57,29 @@ describe('Decorators', () => {
         }
         const item = new MyClass();
         expect(await item.addAync(5, 5)).toBe(10);
+    });
+
+    it('should use @beforeAsync() and @afterAsync() and return result', async ()=> {
+        class UserAction {
+            public status: string;
+            constructor() {
+                this.status = 'unknown';
+            }
+            @beforeAsync(async () => {
+                return await new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve({
+                            value: 'loaded'
+                        });
+                    }, 1000);
+                });
+            })
+            async load() {
+                return 'loading';
+            }
+        }
+        const item = new UserAction();
+        const result = await item.load();
+        expect(result).toBe('loaded');
     });
 });

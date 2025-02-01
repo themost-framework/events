@@ -150,3 +150,149 @@ Start sending and receiving messages:
         // write your code here
     });
 
+### @before and @after decorators
+
+Use `@before` and `@after` decorators for decorating any class method and execute a procedure before and after method execution.
+
+```javascript
+    import { before, after } from '@themost/events';
+
+    class UserAction {
+        
+        constructor() {
+            this.status = 'unknown';
+        }
+        
+        @before((event) => {
+            event.target.status = 'waiting';
+        })
+        @after((event) => {
+            event.target.status = 'active';
+        })
+        load() {
+            //
+        }        
+    }
+    const item = new UserAction();
+    item.load();
+    console.log('Loaded', 'status', item.status);
+```
+
+The `event` object contains the following properties:
+
+- `target` - the target object which the method is called
+- `args` - the method arguments
+- `result` - the method return value for `@after` and `@afterAsync` decorators
+
+`@before` and `@after` callables may return a value which overrides the original method return value. The following example demonstrates how to override the original method return value.
+
+```javascript
+    import { before, after } from '@themost/events';
+
+    class UserAction {
+        constructor() {
+            this.status = 'unknown';
+        }
+        
+        @before((event) => {
+            event.target.status = 'waiting';
+            return 'loaded';
+        })
+        load() {
+            return 'loading';
+        }
+    }
+    const item = new UserAction();
+    const result = item.load();
+    console.log('Loaded', 'status', item.status, 'result', result);
+```
+
+`@before` and `@after` callables may return a value which overrides the original method return value. The following example demonstrates how to override the original method return value.
+
+```javascript
+    import { before, after } from '@themost/events';
+
+    class UserAction {
+        constructor() {
+            this.status = 'unknown';
+        }
+        
+        @before((event) => {
+            event.target.status = 'waiting';
+            return {
+                value: 'loaded'
+            };
+        })
+        load() {
+            return 'loading';
+        }
+    }
+    const item = new UserAction();
+    const result = item.load();
+    console.log('Loaded', 'status', item.status, 'result', result);
+```
+
+### @beforeAsync and @afterAsync decorators
+
+Use `@beforeAsync` and `@afterAsync` decorators for decorating any class method and execute an async procedure before and after method execution.
+
+```javascript
+    import { beforeAsync, afterAsync } from '@themost/events';
+
+    class UserAction {
+        
+        constructor() {
+            this.status = 'unknown';
+        }
+        
+        @beforeAsync(async (event) => {
+            await new Promise((resolve) => {
+                setTimeout(() => {
+                    event.target.status = 'waiting';
+                    resolve();
+                }, 1000);
+            });
+        })
+        @afterAsync(async (event) => {
+            event.target.status = 'active';
+        })
+        async load() {
+            return this.status;
+        }        
+    }
+    (async function () {
+        const item = new UserAction();
+        await item.load();
+        console.log('Loaded', 'status', item.status);
+    })();
+```
+
+`@beforeAsync` and `@afterAsync` callables may return a value which overrides the original method return value. The following example demonstrates how to override the original method return value.
+
+```javascript
+    import { beforeAsync, afterAsync } from '@themost/events';
+
+    class UserAction {
+        constructor() {
+            this.status = 'unknown';
+        }
+        
+        @beforeAsync(async (event) => {
+            return await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve({
+                        value: 'loaded'
+                    });
+                }, 1000);
+            });
+        })
+        async load() {
+            return 'loading';
+        }
+    }
+    (async function () {
+        const item = new UserAction();
+        const result = await item.load();
+        console.log('Loaded', 'status', item.status, 'result', result);
+    })();
+```
