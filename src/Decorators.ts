@@ -3,6 +3,60 @@ declare type BeforeAfterResult<T> = void | {
     value: T
 } 
 
+declare type BeforeAfterEvent<T> = {
+    target: any,
+    args: any[],
+    result?: T
+}
+
+declare type BeforeAfterCallback<T> = (err: Error | unknown, result?: { value: T }) => void;
+
+
+/**
+ * A decorator function that executes a specified callable function before the original method.
+ * The callable function can modify the arguments or prevent the original method from being called.
+ *
+ * @param callable - A function that takes an event object and a callback function as arguments.
+ *                   The event object contains the target object and the arguments of the original method.
+ *                   The callback function should be called with an error or a result object.
+ *                   If the result object contains a 'value' property, the original method will not be called.
+ *                   Otherwise, the original method will be called with the modified arguments.
+ * @returns A decorator function that can be applied to a method.
+ */
+function before(callable: (event: BeforeAfterEvent<any>, ...callback: [BeforeAfterCallback<any>]) => BeforeAfterResult<any>): any {
+    return function (target: Object, 
+        propertyKey: string, 
+        descriptor: TypedPropertyDescriptor<any>) {
+        const originalMethod = descriptor.value;
+        descriptor.value = function (...args: any[]) {
+            const target = this;
+            // get callback function from arguments
+            const callback = args.pop();
+            if (typeof callback !== 'function') {
+                throw new Error('Callback function is missing');
+            }
+            // execute callable function
+            return callable({
+                target,
+                args
+            }, (err, result) => {
+                if (err) {
+                    return callback(err);
+                }
+                if (result && Object.prototype.hasOwnProperty.call(result, 'value')) {
+                    // execute original callback function with the result
+                    return callback(null, result.value);
+                }
+                // push callback function back to arguments
+                args.push(callback);
+                // execute original method
+                return originalMethod.apply(this, args);
+            });
+        };
+        return descriptor;
+    };
+}
+
 /**
  * A decorator function that executes a given callback function before the original method is called.
  *
@@ -27,7 +81,7 @@ declare type BeforeAfterResult<T> = void | {
  * // Original method test 42
  * ```
  */
-function before(callable: (event: { target: any, args: any[] }) => BeforeAfterResult<any>): any {
+function beforeSync(callable: (event: BeforeAfterEvent<any>) => BeforeAfterResult<any>): any {
     return function (target: Object, 
         propertyKey: string, 
         descriptor: TypedPropertyDescriptor<any>) {
@@ -87,6 +141,41 @@ function beforeAsync(callable: (event: { target: any, args: any[] }) => Promise<
     };
 }
 
+function after(callable: (event: BeforeAfterEvent<any>, ...callback: [BeforeAfterCallback<any>]) => void): any {
+    return function (target: Object, 
+        propertyKey: string, 
+        descriptor: TypedPropertyDescriptor<any>) {
+        const originalMethod = descriptor.value;
+        descriptor.value = function (...args: any[]) {
+            const target = this;
+            // get the original callback function
+            const originalCallback = args.pop();
+            if (typeof originalCallback !== 'function') {
+                throw new Error('Callback function is missing');
+            }
+            void originalMethod.apply(this, args.concat((err: Error, result: any) => {
+                if (err) {
+                    return originalCallback(err);
+                }
+                return callable({
+                    target,
+                    args,
+                    result
+                }, (err, res) => {
+                    if (err) {
+                        return originalCallback(err);
+                    }
+                    if (res && Object.prototype.hasOwnProperty.call(res, 'value')) {
+                        return originalCallback(null, res.value);
+                    }
+                    return originalCallback(null, result);
+                });
+            }));
+        };
+        return descriptor;
+    };
+}
+
 /**
  * A decorator function that executes a given callback function after the original method is called.
  *
@@ -94,14 +183,15 @@ function beforeAsync(callable: (event: { target: any, args: any[] }) => Promise<
  * the arguments passed to the original method, and the result of the original method.
  * @returns A decorator function that wraps the original method and calls the callback function after the method execution.
  */
-function after(callable: (event: { target: any, args: any, result?: any }) => BeforeAfterResult<any>): any {
+function afterSync(callable: (event: BeforeAfterEvent<any>) => BeforeAfterResult<any>): any {
     return function (target: Object, 
         propertyKey: string, 
         descriptor: TypedPropertyDescriptor<any>): any {
         const originalMethod = descriptor.value;
         descriptor.value = function (...args: any[]) {
-            const result = originalMethod.apply(this, args);
             const target = this;
+            // else execute the original method and return the result
+            const result = originalMethod.apply(this, args);
             const res = callable({
                 target,
                 args,
@@ -158,9 +248,13 @@ function afterAsync(callable: (event: { target: any, args: any, result?: any }) 
 }
 
 export {
+    BeforeAfterEvent,
     BeforeAfterResult,
+    BeforeAfterCallback,
     before,
-    beforeAsync,
     after,
+    beforeSync,
+    beforeAsync,
+    afterSync,
     afterAsync
 }

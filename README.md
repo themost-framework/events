@@ -149,12 +149,12 @@ Start sending and receiving messages:
         // write your code here
     });
 
-### @before and @after decorators
+### @beforeSync and @afterSync decorators
 
-Use `@before` and `@after` decorators for decorating any class method and execute a procedure before and after method execution.
+Use `@beforeSync` and `@afterSync` decorators for decorating any class method and execute a procedure before and after method execution.
 
 ```javascript
-    import { before, after } from '@themost/events';
+    import { beforeSync, afterSync } from '@themost/events';
 
     class UserAction {
         
@@ -162,10 +162,10 @@ Use `@before` and `@after` decorators for decorating any class method and execut
             this.status = 'unknown';
         }
         
-        @before((event) => {
+        @beforeSync((event) => {
             event.target.status = 'waiting';
         })
-        @after((event) => {
+        @afterSync((event) => {
             event.target.status = 'active';
         })
         load() {
@@ -181,32 +181,9 @@ The `event` object contains the following properties:
 
 - `target` - the target object which the method is called
 - `args` - the method arguments
-- `result` - the method return value for `@after` and `@afterAsync` decorators
+- `result` - the method return value for `@afterSync` and `@afterAsync` decorators
 
-`@before` and `@after` callables may return a value which overrides the original method return value. The following example demonstrates how to override the original method return value.
-
-```javascript
-    import { before, after } from '@themost/events';
-
-    class UserAction {
-        constructor() {
-            this.status = 'unknown';
-        }
-        
-        @before((event) => {
-            event.target.status = 'waiting';
-            return 'loaded';
-        })
-        load() {
-            return 'loading';
-        }
-    }
-    const item = new UserAction();
-    const result = item.load();
-    console.log('Loaded', 'status', item.status, 'result', result);
-```
-
-`@before` and `@after` callables may return a value which overrides the original method return value. The following example demonstrates how to override the original method return value.
+`@beforeSync` and `@afterSync` callables may return a value which overrides the original method return value. The following example demonstrates how to override the original method return value.
 
 ```javascript
     import { before, after } from '@themost/events';
@@ -216,7 +193,7 @@ The `event` object contains the following properties:
             this.status = 'unknown';
         }
         
-        @before((event) => {
+        @beforeSync((event) => {
             event.target.status = 'waiting';
             return {
                 value: 'loaded'

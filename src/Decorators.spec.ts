@@ -1,13 +1,13 @@
-import { after, before, beforeAsync, afterAsync } from "./Decorators";
+import { afterSync, before, after, beforeSync, beforeAsync, afterAsync, BeforeAfterEvent, BeforeAfterCallback } from "./Decorators";
 
 describe('Decorators', () => {
     it('should use @before() and @after()', async ()=> {
         class MyClass {
-            @before((event) => {
+            @beforeSync((event) => {
                 expect(event.target).toBeInstanceOf(MyClass);
                 expect(event.args).toEqual([5, 5]);
             })
-            @after((event) => {
+            @afterSync((event) => {
                 expect(event.target).toBeInstanceOf(MyClass);
                 expect(event.args).toEqual([5, 5]);
                 expect(event.result).toBe(10);
@@ -26,7 +26,7 @@ describe('Decorators', () => {
             constructor() {
                 this.status = 'unknown';
             }
-            @before(() => {
+            @beforeSync(() => {
                 return {
                     value: 'loaded'
                 }
@@ -81,6 +81,36 @@ describe('Decorators', () => {
         const item = new UserAction();
         const result = await item.load();
         expect(result).toBe('loaded');
+    });
+
+
+    it('should use @before() and @after() with callbacks', async ()=> {
+        class UserAction {
+            public status: string;
+            constructor() {
+                this.status = 'unknown';
+            }
+            @before((event: BeforeAfterEvent<any>, callback: BeforeAfterCallback<any>) => {
+                void setTimeout(() => {
+                    return callback(null, {
+                        value: 'loaded'
+                    });
+                }, 1000);
+            })
+            async load(callback: (err: Error | unknown, result?: string) => void) {
+                return callback(null, 'loading');
+            }
+        }
+        await new Promise((resolve, reject) => {
+            const item = new UserAction();
+            item.load((err, result) => {
+                if (err) {
+                    reject(err);
+                }
+                expect(result).toBe('loaded');
+                resolve(void 0);
+            });
+        });
     });
 
 });
