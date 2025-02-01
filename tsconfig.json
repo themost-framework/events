@@ -5,6 +5,7 @@
         "module": "ESNext",
         "moduleResolution": "node",
         "sourceMap": true,
+        "sourceRoot": "./",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "removeComments": false,
