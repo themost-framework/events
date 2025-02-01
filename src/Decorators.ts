@@ -24,8 +24,8 @@ declare type BeforeAfterCallback<T> = (err: Error | unknown, result?: { value: T
  * @returns A decorator function that can be applied to a method.
  */
 function before(callable: (event: BeforeAfterEvent<any>, ...callback: [BeforeAfterCallback<any>]) => BeforeAfterResult<any>): any {
-    return function (target: Object, 
-        propertyKey: string, 
+    return function (_target: Object,
+                     _propertyKey: string,
         descriptor: TypedPropertyDescriptor<any>) {
         const originalMethod = descriptor.value;
         descriptor.value = function (...args: any[]) {
@@ -93,8 +93,8 @@ function before(callable: (event: BeforeAfterEvent<any>, ...callback: [BeforeAft
  * ```
  */
 function beforeAsync(callable: (event: { target: any, args: any[] }) => Promise<BeforeAfterResult<any>>): any {
-    return function (target: Object, 
-        propertyKey: string, 
+    return function (_target: Object,
+                     _propertyKey: string,
         descriptor: TypedPropertyDescriptor<any>): any {
         const originalMethod = descriptor.value;
         descriptor.value = async function (...args: any[]) {
@@ -141,8 +141,8 @@ function beforeAsync(callable: (event: { target: any, args: any[] }) => Promise<
  * ```
  */
 function after(callable: (event: BeforeAfterEvent<any>, ...callback: [BeforeAfterCallback<any>]) => BeforeAfterResult<any>): any {
-    return function (target: Object, 
-        propertyKey: string, 
+    return function (_target: Object,
+                     _propertyKey: string,
         descriptor: TypedPropertyDescriptor<any>) {
         const originalMethod = descriptor.value;
         descriptor.value = function (...args: any[]) {
@@ -212,8 +212,8 @@ function after(callable: (event: BeforeAfterEvent<any>, ...callback: [BeforeAfte
  * ```
  */
 function afterAsync(callable: (event: { target: any, args: any, result?: any }) => Promise<BeforeAfterResult<any>>): any {
-    return function (target: Object, 
-        propertyKey: string, 
+    return function (_target: Object,
+                     _propertyKey: string,
         descriptor: TypedPropertyDescriptor<any>): any {
         const originalMethod = descriptor.value;
         descriptor.value = async function (...args: any[]) {

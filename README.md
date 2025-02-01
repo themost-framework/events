@@ -208,6 +208,35 @@ The `event` object contains the following properties:
     console.log('Loaded', 'status', item.status, 'result', result);
 ```
 
+### @before and @after decorators with callback
+
+Use `@before` and `@after` decorators with callback for decorating any class method and execute a procedure before and after method execution.
+
+```javascript
+    import { before, after } from '@themost/events';
+
+    class UserAction {
+        
+        constructor() {
+            this.status = 'unknown';
+        }
+        
+        @before((event, callback) => {
+            void setTimeout(() => {
+                event.target.status = 'loaded';
+                return callback();
+            }, 1000);
+        })
+        load(callback) {
+            this.status = 'loading';
+            return callback();
+        }        
+    }
+    const item = new UserAction();
+    item.load();
+    console.log('Loaded', 'status', item.status);
+```
+
 ### @beforeAsync and @afterAsync decorators
 
 Use `@beforeAsync` and `@afterAsync` decorators for decorating any class method and execute an async procedure before and after method execution.

@@ -51,12 +51,12 @@ describe('Decorators', () => {
                 expect(event.args).toEqual([5, 5]);
                 expect(event.result).toBe(10);
             })
-            public addAync(a: number, b: number) {
+            public addAsync(a: number, b: number) {
                 return Promise.resolve(a + b);
             }
         }
         const item = new MyClass();
-        expect(await item.addAync(5, 5)).toBe(10);
+        expect(await item.addAsync(5, 5)).toBe(10);
     });
 
     it('should use @beforeAsync() and @afterAsync() and return result', async ()=> {
@@ -90,7 +90,7 @@ describe('Decorators', () => {
             constructor() {
                 this.status = 'unknown';
             }
-            @before((event: BeforeAfterEvent<any>, callback: BeforeAfterCallback<any>) => {
+            @before((_event: BeforeAfterEvent<any>, callback: BeforeAfterCallback<any>) => {
                 void setTimeout(() => {
                     return callback(null, {
                         value: 'loaded'
